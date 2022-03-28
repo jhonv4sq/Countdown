@@ -2,7 +2,7 @@ $(document).ready(function(){
     
     show(0,0);
 
-    let f;
+    let repeat;
     let input = document.querySelector("#input");
     let button_start = document.querySelector("#button1");
     let button_stop = document.querySelector("#button2");
@@ -10,73 +10,95 @@ $(document).ready(function(){
     button_start.addEventListener("click", function(){
 
         let array = input.value.split(":");
-        let min = parseInt(array[0]);
-        let seg = parseInt(array[1]);
         
-        if(isNaN(min) || isNaN(seg)){
-            let alert =document.getElementById("alert");
-            alert.innerHTML = "<div class='alert alert-warning alert-dismissible fade show' role='alert'>"+
-                               "<strong>"+ input.value + "</strong>  No es un dato valido"+
-                               "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>"+
-                                  "<span aria-hidden='true'>&times;</span>"+
-                               "</button>"+
-                              "</div>"+
-                              "<div class='alert alert-primary alert-dismissible fade show' role='alert'>"+
-                               "Debes introducir los minutos y segundos separados por<strong> ' : '</strong> ejemplo <strong>3:40</strong> "+
-                               "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>"+
-                                  "<span aria-hidden='true'>&times;</span>"+
-                               "</button>"+
-                              "</div>";
+        let minute = parseInt(array[0]);
+        let second = parseInt(array[1]);
+        
+        switch(isNaN(minute) || isNaN(second)){
+            case true: 
+                show_alert(3);
+                break;
+            
+            default: 
+                button_start.disabled = true;
+                button_stop.disabled = false;
 
-        }else{
-            button_start.disabled = true;
-            button_stop.disabled = false;
-            show(min, seg);
-            f = start(min, seg, f, button_start, button_stop);
+                show(minute, second);
+                show_alert(1);
+                repeat = start(minute, second, repeat, button_start, button_stop);
+                break;
         }
-        
+
     });
-    
+
     button_stop.addEventListener("click", function(){
         button_start.disabled = false;
         button_stop.disabled = true;
-        stop(f);
+        stop(repeat);
+        show_alert(4);
     });
     
 });
 
-function show(min, seg){
-    let div = document.getElementById("contador");
-    if (min < 10){
-        min = "0"+min;
+function show(minute, second){
+    let countdown = document.getElementById("countdown");
+
+    if (minute < 10){
+        minute = "0"+minute;
     }
-    if(seg < 10){
-        seg = "0"+seg;
+
+    if(second < 10){
+        second = "0"+second;
     }
-    div.innerHTML = "<h1> "+ min +":"+ seg +" </h1>";
+
+    countdown.innerHTML = "<h1 class='time'> "+ minute +":"+ second +" </h1>";
 }
 
-function start(min, seg, f, button_start, button_stop){
-    f = setInterval(function(){
-        if(seg != 0){
-            seg--;
+function start(minute, second, repeat, button_start, button_stop){
+
+    repeat = setInterval(function(){
+
+        if(second != 0){
+            second--;
         }
-        else if(seg == 0 && min != 0){
-            min--;
-            seg = 59;
+
+        if(second == 0 && minute != 0){
+            minute--;
+            second = 59;
         }
-        if(min == 0 && seg == 0){
-            stop(f);
-            console.log("temino la cuenta regresiva");
+
+        if(minute == 0 && second == 0){
+            stop(repeat);
+            show_alert(2);
             button_start.disabled = false;
             button_stop.disabled = true;
-            
         }
-        show(min, seg);
+
+        show(minute, second);
+
     }, 1000);
-    return f;
+
+    return repeat;
 }
 
-function stop(f){
-    clearInterval(f);
+function stop(repeat){
+    clearInterval(repeat);
+}
+
+function show_alert(number){
+
+    const message = {
+        1: ['Cuenta regresiva iniciada', 'primary'],
+        2: ['Cuenta regresiva Finalizada', 'info'],
+        3: ['Valor no valido', 'warning'],
+        4: ['Se ha detenido', 'danger']
+    }
+
+    let alert =document.getElementById("alert");
+    alert.innerHTML = "<div class='text-center alert alert-"+ message[number][1] + " alert-dismissible fade show' role='alert'>"+
+                       "<strong> "+ message[number][0] +" </strong>"+
+                       "<button type='button' class='close' data-dismiss='alert' aria-label='Close'>"+
+                          "<span aria-hidden='true'>&times;</span>"+
+                       "</button>"+
+                      "</div>";
 }

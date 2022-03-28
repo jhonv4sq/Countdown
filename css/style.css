@@ -2,3 +2,13 @@ body{
     background: rgb(49, 49, 49);
     color: aliceblue;
 }
+
+#countdown{
+    background-color: #181818;
+}    
+.time{
+    font-family: 'DotGothic16', sans-serif;
+    font-size: 3rem;
+    color: #00a6cc;
+    text-shadow: 0 0 0.2em #00a6cc;
+}
